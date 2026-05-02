@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<title>PFG · App Redesign</title>
+<meta name="viewport" content="width=1440"/>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Fraunces:opsz,wght@9..144,500;9..144,700;9..144,800&family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    /* === Vibe palette (default: Field Guide / dark cyan) === */
+    --pfg-bg:        #0a1620;
+    --pfg-bg-2:      #0d1b2a;
+    --pfg-surface:   #112433;
+    --pfg-fg:        #e6eef5;
+    --pfg-fg-muted:  #7a8b99;
+    --pfg-accent:    #00bcd4;
+    --pfg-go:        #4caf50;
+    --pfg-scout:     #ffd54f;
+    --pfg-hold:      #f44336;
+    --pfg-spawn:     #ff6b35;
+    --pfg-lunar:     #ab47bc;
+    --pfg-line:      rgba(255,255,255,0.06);
+
+    /* === Density (default: Standard) === */
+    --pfg-density:    1;       /* multiplier for paddings/gaps */
+    --pfg-type-scale: 1;       /* multiplier for font sizes   */
+
+    /* === Urgency (default: Alert) === */
+    --pfg-pulse-dur:  2.6s;    /* GO badge pulse cadence  */
+    --pfg-glow:       0.35;    /* accent halo strength    */
+    --pfg-shake:      0;       /* combat shake intensity  */
+
+    /* === Typography stacks (vibe-driven) === */
+    --pfg-font-body:    "Manrope", -apple-system, system-ui, sans-serif;
+    --pfg-font-display: "Manrope", -apple-system, system-ui, sans-serif;
+    --pfg-font-mono:    "JetBrains Mono", ui-monospace, monospace;
+    --pfg-letter:       0;
+    --pfg-radius-mult:  1;
+    --pfg-noise:        none;
+  }
+
+  /* === VIBE: Tackle Shop (warm paper, teal, cream, serif display) === */
+  body[data-vibe="tackle-shop"] {
+    --pfg-bg:        #efe7d4;
+    --pfg-bg-2:      #e6dcc4;
+    --pfg-surface:   #faf3df;
+    --pfg-fg:        #2a1f14;
+    --pfg-fg-muted:  #6b5a40;
+    --pfg-accent:    #0a7d8c;
+    --pfg-go:        #3d6a3a;
+    --pfg-scout:     #c47e1c;
+    --pfg-hold:      #a8331e;
+    --pfg-spawn:     #c44a1c;
+    --pfg-lunar:     #5e3d72;
+    --pfg-line:      rgba(42,31,20,0.14);
+    --pfg-font-body:    "Space Grotesk", sans-serif;
+    --pfg-font-display: "Fraunces", "Times New Roman", serif;
+    --pfg-font-mono:    "Space Mono", ui-monospace, monospace;
+    --pfg-radius-mult:  1.2;
+    --pfg-noise: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.16 0 0 0 0 0.12 0 0 0 0 0.06 0 0 0 0.18 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  }
+
+  /* === VIBE: Sonar (high-contrast cyan-on-near-black, mono, scanlines) === */
+  body[data-vibe="sonar"] {
+    --pfg-bg:        #02080c;
+    --pfg-bg-2:      #04101a;
+    --pfg-surface:   #061826;
+    --pfg-fg:        #c9fbff;
+    --pfg-fg-muted:  #4a7a82;
+    --pfg-accent:    #00ffe7;
+    --pfg-go:        #00ff7f;
+    --pfg-scout:     #fff200;
+    --pfg-hold:      #ff2e6e;
+    --pfg-spawn:     #ff7a00;
+    --pfg-lunar:     #b266ff;
+    --pfg-line:      rgba(0,255,231,0.16);
+    --pfg-font-body:    "JetBrains Mono", ui-monospace, monospace;
+    --pfg-font-display: "JetBrains Mono", ui-monospace, monospace;
+    --pfg-font-mono:    "JetBrains Mono", ui-monospace, monospace;
+    --pfg-letter:       0.02em;
+    --pfg-radius-mult:  0.25;
+  }
+
+  /* === DENSITY tiers (apply to body) === */
+  body[data-density="spacious"] { --pfg-density: 1.25; --pfg-type-scale: 1.08; }
+  body[data-density="standard"] { --pfg-density: 1;    --pfg-type-scale: 1; }
+  body[data-density="packed"]   { --pfg-density: 0.78; --pfg-type-scale: 0.92; }
+
+  /* === URGENCY tiers === */
+  body[data-urgency="calm"]   { --pfg-pulse-dur: 5s;   --pfg-glow: 0.12; --pfg-shake: 0; }
+  body[data-urgency="alert"]  { --pfg-pulse-dur: 2.4s; --pfg-glow: 0.45; --pfg-shake: 0; }
+  body[data-urgency="combat"] { --pfg-pulse-dur: 0.9s; --pfg-glow: 0.85; --pfg-shake: 1; }
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background-color: var(--pfg-bg);
+    background-image:
+      radial-gradient(ellipse at 20% 0%, color-mix(in oklab, var(--pfg-accent) 10%, var(--pfg-bg-2)) 0%, transparent 55%),
+      radial-gradient(ellipse at 80% 100%, var(--pfg-bg-2) 0%, transparent 55%);
+    color: var(--pfg-fg);
+    font-family: var(--pfg-font-body);
+    letter-spacing: var(--pfg-letter);
+    min-height: 100vh;
+    overflow-x: hidden;
+    transition: background-color 400ms ease, color 400ms ease;
+  }
+  /* Heading display font swap is opt-in via class so dynamic JSX text in
+     components doesn't break, but big visual headlines pick it up. */
+  body h1, body h2 { font-family: var(--pfg-font-display); }
+  body[data-vibe="tackle-shop"] h1, body[data-vibe="tackle-shop"] h2 { letter-spacing: -0.02em; }
+
+  /* Density: scale main padding and headings via root font-size proxy */
+  main {
+    --d: var(--pfg-density);
+    padding-top:    calc(24px * var(--d)) !important;
+    padding-bottom: calc(80px * var(--d)) !important;
+  }
+  main h1 { font-size: calc(28px * var(--pfg-type-scale)) !important; }
+
+  /* === VIBE chrome overrides ============================================
+     Many components have hardcoded dark backgrounds. We selectively re-skin
+     them per vibe via attribute selectors so the chrome matches the page. */
+
+  /* Tackle Shop — dark cards float on cream paper, but chrome goes warm.
+     React serializes inline styles with spaces inside rgba() and converts
+     short hex to rgb(), so selectors must match those forms. */
+  body[data-vibe="tackle-shop"] aside[style*="rgb(10, 23, 38)"],
+  body[data-vibe="tackle-shop"] aside[style*="rgb(15, 34, 53)"],
+  body[data-vibe="tackle-shop"] [style*="rgba(13, 27, 42, 0.85)"] {
+    background: var(--pfg-bg-2) !important;
+    border-color: var(--pfg-line) !important;
+  }
+  body[data-vibe="tackle-shop"] [style*="rgba(255, 255, 255, 0.06)"] {
+    border-color: var(--pfg-line) !important;
+  }
+
+  /* Sonar — push everything toward black + neon */
+  body[data-vibe="sonar"] aside[style*="rgb(10, 23, 38)"],
+  body[data-vibe="sonar"] aside[style*="rgb(15, 34, 53)"],
+  body[data-vibe="sonar"] [style*="rgba(13, 27, 42, 0.85)"] {
+    background: var(--pfg-bg-2) !important;
+    border-color: var(--pfg-line) !important;
+    box-shadow: inset 0 0 0 1px var(--pfg-line) !important;
+  }
+  body[data-vibe="sonar"] [style*="border-radius: 999"] { border-radius: 0 !important; }
+  body[data-vibe="sonar"] button[style*="border-radius: 8"],
+  body[data-vibe="sonar"] [style*="border-radius: 10"],
+  body[data-vibe="sonar"] [style*="border-radius: 12"],
+  body[data-vibe="sonar"] [style*="border-radius: 16"] {
+    border-radius: 2px !important;
+  }
+  body[data-vibe="sonar"] {
+    text-transform: none;
+  }
+  body[data-vibe="sonar"] h1 { text-transform: uppercase; }
+  body[data-vibe="tackle-shop"]::before {
+    content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 1;
+    background-image: var(--pfg-noise); opacity: 0.6; mix-blend-mode: multiply;
+  }
+  body[data-vibe="sonar"]::before {
+    content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 1;
+    background:
+      repeating-linear-gradient(0deg,
+        rgba(0,255,231,0.04) 0px,
+        rgba(0,255,231,0.04) 1px,
+        transparent 1px,
+        transparent 3px);
+  }
+  body[data-vibe="sonar"]::after {
+    content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 2;
+    background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.55) 100%);
+  }
+  /* Sonar: chunkier corners off, sharper edges */
+  body[data-vibe="sonar"] [style*="border-radius"] {
+    /* CSS can't reach inline styles directly; this is a no-op marker. */
+  }
+
+  /* === URGENCY-DRIVEN MOTION === */
+  @keyframes pfg-pulse {
+    0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--pfg-go) 50%, transparent); }
+    50%      { box-shadow: 0 0 0 calc(10px * var(--pfg-glow)) color-mix(in srgb, var(--pfg-go) 0%, transparent); }
+  }
+  @keyframes pfg-shake {
+    0%, 92%, 100% { transform: translate3d(0,0,0); }
+    93% { transform: translate3d(-1px, 0, 0); }
+    95% { transform: translate3d(2px, 0, 0); }
+    97% { transform: translate3d(-1px, 0, 0); }
+  }
+  /* Apply to verdict pills / GO chips wherever they show up */
+  body[data-urgency] [class*="verdict"],
+  body[data-urgency] [data-verdict-pill] {
+    animation: pfg-pulse var(--pfg-pulse-dur) ease-in-out infinite;
+  }
+  body[data-urgency="combat"] [data-verdict-pill] {
+    animation: pfg-pulse var(--pfg-pulse-dur) ease-in-out infinite,
+               pfg-shake 4s ease-in-out infinite;
+  }
+  /* Accent glow for buttons / outlines via filter halo */
+  body[data-urgency] button[style*="var(--pfg-accent)"]:not([disabled]) {
+    box-shadow: 0 0 calc(18px * var(--pfg-glow)) color-mix(in srgb, var(--pfg-accent) calc(var(--pfg-glow) * 100%), transparent);
+  }
+  ::selection { background: var(--pfg-accent); color: #0d1b2a; }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar { width: 10px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.08);
+    border-radius: 5px;
+  }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.16); }
+
+  #root { min-height: 100vh; }
+</style>
+</head>
+<body>
+
+<div id="root"></div>
+
+<!-- Standalone Tweaks toggle: posts the same activation message the Claude
+     Design host would, so the floating Tweaks panel is reachable when this
+     prototype runs outside the design canvas. -->
+<button id="tweaks-toggle" type="button" aria-label="Open tweaks panel"
+  onclick="window.postMessage({type:'__activate_edit_mode'},'*')"
+  style="position:fixed;right:16px;bottom:16px;z-index:2147483645;
+         width:40px;height:40px;border-radius:999px;
+         border:1px solid rgba(255,255,255,0.14);
+         background:rgba(13,27,42,0.85);color:#e6eef5;
+         font:600 16px/1 system-ui,sans-serif;cursor:pointer;
+         backdrop-filter:blur(12px);
+         box-shadow:0 6px 18px rgba(0,0,0,0.35);">⚙</button>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<!-- Real Arkansas species dataset → window.SPECIES (with art paths, latin, habitat, spawn temps, baits, tips, fun facts, stats) -->
+<script src="data/species.js?v=3"></script>
+
+<!-- Component bundles (each registers globals on window) -->
+<script type="text/babel" src="components-v2/PfgIcons.jsx"></script>
+<script type="text/babel" src="components-v2/PfgShell.jsx"></script>
+<script type="text/babel" src="components-v2/PfgHero.jsx"></script>
+<script type="text/babel" src="components-v2/PfgHome.jsx"></script>
+<script type="text/babel" src="components-v2/PfgAuth.jsx"></script>
+<script type="text/babel" src="components-v2/PfgProfile.jsx"></script>
+<script type="text/babel" src="components-v2/PfgTackle.jsx"></script>
+<script type="text/babel" src="components-v2/PfgSpecies.jsx"></script>
+<script type="text/babel" src="components-v2/PfgDock.jsx"></script>
+
+<script type="text/babel" src="tweaks-panel.jsx"></script>
+
+<script type="text/babel" data-presets="env,react">
+/* ============================================================
+   PFG App Shell — top-level state machine.
+   Routes:
+     home, signals, forecast, technique, access, game,
+     profile, tackle, species, dock, login, signup
+   Nav variant: "drawer" (toggle button + overlay) | "rail" (always-visible)
+   Hero variant: "verdict" | "card" | "dashboard"
+   ============================================================ */
+const { useState, useEffect } = React;
+
+const DEFAULT_USER = {
+  name: "River Runner",
+  handle: "@river_runner",
+  email: "river_runner@example.com",
+  joined: "Mar 2024",
+  region: "Arkansas Ozarks",
+  homeWater: "Bull Shoals · Norfork tailwater",
+  pfgScore: 1820,
+  outings: 47,
+  speciesCaught: 22,
+  trophyCount: 4
+};
+
+const SIGNAL = {
+  verdict: "GO",
+  waterTemp: 54.5,
+  baro: "Rising",
+  baroValue: 30.18,
+  wind: "SW 6 mph",
+  moon: "Waxing crescent · 38%",
+  spawn: { species: "White Bass", phase: "Peak run", confidence: 0.92 },
+  conditions: "Stable front · 36hr clear window",
+  lake: "Bull Shoals Lake",
+  date: "Sat · May 10"
+};
+
+function App() {
+  const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+    "vibe": "field-guide",
+    "density": "spacious",
+    "urgency": "calm"
+  }/*EDITMODE-END*/;
+  const [tweaks, setTweak] = useTweaks(TWEAK_DEFAULTS);
+
+  // reflect tweaks onto <body> as data-* attrs so all CSS overrides activate
+  useEffect(() => {
+    document.body.dataset.vibe    = tweaks.vibe;
+    document.body.dataset.density = tweaks.density;
+    document.body.dataset.urgency = tweaks.urgency;
+  }, [tweaks.vibe, tweaks.density, tweaks.urgency]);
+
+  const [route, setRoute]             = useState("home");
+  const [auth, setAuth]               = useState(null); // null | "login" | "signup"
+  const [user, setUser]               = useState(DEFAULT_USER); // start logged-in for prototype
+  const [drawerOpen, setDrawerOpen]   = useState(false);
+  const [navVariant, setNavVariant]   = useState("rail"); // rail | drawer
+  const [railExpanded, setRailExpand] = useState(false);
+  const [heroVariant, setHeroVariant] = useState("verdict");
+
+  const handleRoute = (r) => {
+    setRoute(r);
+    setDrawerOpen(false);
+    window.scrollTo({ top: 0 });
+  };
+
+  const onLogin = (data) => {
+    setUser({ ...DEFAULT_USER, ...data });
+    setAuth(null);
+    setRoute("home");
+  };
+  const onSignOut = () => {
+    setUser(null);
+    setRoute("home");
+    setDrawerOpen(false);
+  };
+
+  const Icons = window.PfgIcons;
+  const railWidth = navVariant === "rail" ? (railExpanded ? 220 : 68) : 0;
+
+  return (
+    <div style={{ display: "flex", minHeight: "100vh" }}>
+      {/* SIDE NAV */}
+      {navVariant === "rail" && user && (
+        <window.PfgSideRail
+          user={user}
+          currentRoute={route}
+          onRoute={handleRoute}
+          expanded={railExpanded}
+          onToggle={() => setRailExpand(e => !e)}
+        />
+      )}
+      {navVariant === "drawer" && (
+        <window.PfgSideDrawer
+          open={drawerOpen}
+          onClose={() => setDrawerOpen(false)}
+          user={user}
+          currentRoute={route}
+          onRoute={handleRoute}
+          onSignOut={onSignOut}
+        />
+      )}
+
+      {/* MAIN COLUMN */}
+      <div style={{ flex: 1, marginLeft: railWidth, transition: "margin-left 200ms ease" }}>
+        <window.PfgTopBar
+          user={user}
+          currentRoute={route}
+          onRoute={handleRoute}
+          signal={SIGNAL}
+          onMenu={navVariant === "drawer" ? () => setDrawerOpen(true) : null}
+          onSignIn={() => setAuth("login")}
+          dense={navVariant === "rail"}
+        />
+
+        {/* Nav-variant switcher (in-prototype only) */}
+        <div style={{
+          maxWidth: 1280, margin: "16px auto 0",
+          padding: "0 32px",
+          display: "flex", justifyContent: "flex-end", gap: 6
+        }}>
+          <span style={{ fontSize: 9, letterSpacing: 1.4, fontWeight: 800,
+                         color: "var(--pfg-fg-muted)", padding: "6px 8px" }}>
+            SIDE NAV
+          </span>
+          {[
+            { id: "rail",   label: "Persistent rail" },
+            { id: "drawer", label: "Hamburger drawer" }
+          ].map(v => {
+            const on = navVariant === v.id;
+            return (
+              <button key={v.id} onClick={() => setNavVariant(v.id)} style={{
+                padding: "5px 12px", borderRadius: 999,
+                background: on ? "var(--pfg-accent)" : "rgba(255,255,255,0.04)",
+                color: on ? "#0d1b2a" : "#cfd8dc",
+                fontSize: 11, fontWeight: 800,
+                border: `1px solid ${on ? "var(--pfg-accent)" : "rgba(255,255,255,0.06)"}`,
+                cursor: "pointer", fontFamily: "inherit"
+              }}>{v.label}</button>
+            );
+          })}
+        </div>
+
+        {/* MAIN CONTENT */}
+        <main data-screen-label={"Route · " + route}
+              style={{ maxWidth: 1280, margin: "0 auto", padding: "24px 32px 80px" }}>
+          {route === "home" && (
+            <window.PfgHomeScreen
+              user={user} signal={SIGNAL}
+              heroVariant={heroVariant}
+              onHeroVariant={setHeroVariant}
+              onRoute={handleRoute}
+            />
+          )}
+          {route === "signals"   && <window.PfgPlaceholderScreen
+              title="Signals" subtitle="Real-time water temp, barometer, wind, moon, and spawn-bar fusion. Existing screen — kept as-is in this redesign round."/>}
+          {route === "forecast"  && <window.PfgPlaceholderScreen
+              title="Forecast" subtitle="14-day outlook with PFG verdict per day, big-fish windows, and pressure trend graphs. Existing screen — kept as-is."/>}
+          {route === "technique" && <window.PfgPlaceholderScreen
+              title="Technique" subtitle="Species-specific playbooks: lure selection, depth, retrieve cadence, structure. Existing screen — kept as-is."/>}
+          {route === "access"    && <window.PfgPlaceholderScreen
+              title="Access" subtitle="Public ramps, parking, regulations, and live ramp cams across Arkansas waters. Existing screen — kept as-is."/>}
+          {route === "game"      && <window.PfgGameScreen/>}
+
+          {route === "profile" && user && <window.PfgProfileScreen user={user} onSignOut={onSignOut}/>}
+          {route === "tackle"  && user && <window.PfgTackleScreen  user={user} signal={SIGNAL}/>}
+          {route === "species" && user && <window.PfgSpeciesScreen user={user}/>}
+          {route === "dock"    && user && <window.PfgDockScreen    user={user}/>}
+
+          {/* gate screens that need login */}
+          {["profile","tackle","species","dock"].includes(route) && !user && (
+            <div style={{
+              padding: 60, textAlign: "center", borderRadius: 16,
+              background: "rgba(255,255,255,0.03)",
+              border: "1px solid rgba(255,255,255,0.06)"
+            }}>
+              <div style={{ fontSize: 9, letterSpacing: 1.6, fontWeight: 800, color: "var(--pfg-fg-muted)" }}>
+                MEMBERS ONLY
+              </div>
+              <h2 style={{ fontSize: 28, color: "#fff", margin: "8px 0 8px", fontWeight: 800, letterSpacing: -0.6 }}>
+                Sign in to view this
+              </h2>
+              <p style={{ color: "var(--pfg-fg-muted)", maxWidth: 380, margin: "0 auto 18px" }}>
+                Your tackle, species deck, profile, and Dock matches are tied to your PFG account.
+              </p>
+              <button onClick={() => setAuth("login")} style={{
+                padding: "12px 22px", borderRadius: 8,
+                background: "var(--pfg-accent)", color: "#0d1b2a",
+                fontSize: 13, fontWeight: 800, border: "none", cursor: "pointer", fontFamily: "inherit"
+              }}>Sign in</button>
+            </div>
+          )}
+        </main>
+      </div>
+
+      {/* TWEAKS PANEL */}
+      <TweaksPanel title="Tweaks">
+        <TweakSection label="Vibe">
+          <TweakRadio
+            value={tweaks.vibe}
+            onChange={(v) => setTweak("vibe", v)}
+            options={[
+              { value: "field-guide", label: "Field Guide" },
+              { value: "tackle-shop", label: "Tackle Shop" },
+              { value: "sonar",       label: "Sonar" }
+            ]}
+          />
+          <div style={{ fontSize: 10, color: "#888", marginTop: -4, lineHeight: 1.4 }}>
+            Re-skins palette, type stack, texture, and corner sharpness across every screen.
+          </div>
+        </TweakSection>
+
+        <TweakSection label="Density">
+          <TweakRadio
+            value={tweaks.density}
+            onChange={(v) => setTweak("density", v)}
+            options={[
+              { value: "spacious", label: "Spacious" },
+              { value: "standard", label: "Standard" },
+              { value: "packed",   label: "Packed" }
+            ]}
+          />
+          <div style={{ fontSize: 10, color: "#888", marginTop: -4, lineHeight: 1.4 }}>
+            Magazine-airy → terminal-tight. Scales padding and type uniformly.
+          </div>
+        </TweakSection>
+
+        <TweakSection label="Signal urgency">
+          <TweakRadio
+            value={tweaks.urgency}
+            onChange={(v) => setTweak("urgency", v)}
+            options={[
+              { value: "calm",   label: "Calm" },
+              { value: "alert",  label: "Alert" },
+              { value: "combat", label: "Combat" }
+            ]}
+          />
+          <div style={{ fontSize: 10, color: "#888", marginTop: -4, lineHeight: 1.4 }}>
+            How loud the GO/SCOUT/HOLD verdict feels — pulse rate, glow, badge shake.
+          </div>
+        </TweakSection>
+      </TweaksPanel>
+
+      {/* AUTH OVERLAY */}
+      {auth && (
+        <div style={{
+          position: "fixed", inset: 0, zIndex: 200,
+          background: "rgba(5,12,20,0.85)", backdropFilter: "blur(8px)",
+          display: "grid", placeItems: "center",
+          padding: 24
+        }} onClick={() => setAuth(null)}>
+          <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 460 }}>
+            {auth === "login" ? (
+              <window.PfgLogin
+                onLogin={onLogin}
+                onSwitchSignup={() => setAuth("signup")}
+                onClose={() => setAuth(null)}
+              />
+            ) : (
+              <window.PfgSignup
+                onSignup={onLogin}
+                onSwitchLogin={() => setAuth("login")}
+                onClose={() => setAuth(null)}
+              />
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(<App/>);
+</script>
+
+</body>
+</html>

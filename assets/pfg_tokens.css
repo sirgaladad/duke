@@ -1,0 +1,229 @@
+/* ============================================================
+   Pocket Fishing Guide — Design Tokens
+   Tale Waters & Tides
+   Source of truth for color + type. Pulled directly from the
+   live app (Dev/index.html :root { ... }) so everything matches.
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+:root {
+  /* ─── Surfaces (deep-water navy stack) ───────────────────── */
+  --pfg-bg:            #0d1b2a;   /* page / deepest water */
+  --pfg-bg2:           #1b2838;   /* card surface */
+  --pfg-bg3:           #243447;   /* raised element / input */
+  --pfg-bg4:           #2d3f52;   /* border on raised element */
+
+  /* ─── Parent-brand — Tale Waters & Tides ─────────────────── */
+  /* Sourced from talewatersandtides.com. The parent brand is navy + amber,
+     serif-led, and evokes "above and below the surface". PFG inherits
+     the navy foundation; the amber/cream show up on marketing surfaces
+     and on any lockup that reads "by Tale Waters & Tides". */
+  --twt-navy:    #0b1c2e;
+  --twt-navy-2:  #122a43;
+  --twt-amber:   #f4a72a;   /* "Collaborate" button + italic display */
+  --twt-sunset:  #e07a1f;
+  --twt-cream:   #f2ece0;   /* serif wordmark, body on dark */
+
+  /* ─── Source-agency colors — used ONLY on attribution chips ─
+     These are pulled straight from each agency's identity system.
+     Keep them behind a border + uppercase text; never use an agency
+     color as a decorative accent elsewhere in the UI. */
+  --agency-agfc:       #2b5e3a;   /* AGFC hunter green */
+  --agency-usace:      #b41e1a;   /* USACE castle red */
+  --agency-usgs:       #006747;   /* USGS shield green */
+  --agency-usgs-blue:  #005ea2;   /* USGS visual-identity blue */
+  --agency-nws:        #1b4e84;   /* National Weather Service blue */
+  /* ─── PFG product accents ────────────────────────────────── */
+  --pfg-accent:        #00bcd4;   /* cyan — product / live / signal */
+  --pfg-accent-dk:     #0097a7;
+  --pfg-accent-lt:     #4dd0e1;
+  --pfg-spawn:         #ff6b35;   /* spawn orange — the "GO FISH!" pulse */
+
+  /* ─── Verdict / status semantic ──────────────────────────── */
+  --pfg-go:            #4caf50;   /* GO — green */
+  --pfg-scout:         #ff9800;   /* SCOUT — orange */
+  --pfg-hold:          #2196f3;   /* HOLD / WAIT — blue */
+  --pfg-danger:        #f44336;   /* warnings, regs, closed */
+  --pfg-yellow:        #ffd54f;   /* peak-run, solar */
+  --pfg-lunar:         #ab47bc;   /* crappie / lunar purple */
+
+  /* ─── Text ───────────────────────────────────────────────── */
+  --pfg-fg:            #e0e6ed;   /* body text on dark */
+  --pfg-fg-muted:      #8899aa;   /* secondary (--text2 in app) */
+  --pfg-fg-dim:        #5a6a7a;   /* tertiary / captions (--text3) */
+  --pfg-fg-inverse:    #000000;   /* text on bright accent fills */
+
+  /* ─── Radii ──────────────────────────────────────────────── */
+  --pfg-radius-sm:     8px;       /* inputs, small cards */
+  --pfg-radius:        12px;      /* default card */
+  --pfg-radius-pill:   20px;      /* pills / chips */
+  --pfg-radius-circle: 50%;       /* avatars, verdict dots */
+
+  /* ─── Elevation / shadows ────────────────────────────────── */
+  --pfg-shadow-card:   0 1px 0 rgba(255,255,255,0.04) inset;
+  --pfg-shadow-signal: 0 0 12px rgba(0,188,212,0.30);
+  --pfg-shadow-go:     0 0 12px rgba(76,175,80,0.30);
+  --pfg-shadow-scout:  0 0 12px rgba(255,152,0,0.30);
+  --pfg-shadow-hold:   0 0 12px rgba(33,150,243,0.30);
+  --pfg-shadow-fab:    0 4px 16px rgba(0,188,212,0.40);
+
+  /* ─── Spacing scale (app uses 4-step rhythm) ─────────────── */
+  --pfg-space-1: 4px;
+  --pfg-space-2: 6px;
+  --pfg-space-3: 8px;
+  --pfg-space-4: 10px;
+  --pfg-space-5: 12px;   /* card padding */
+  --pfg-space-6: 16px;   /* large card padding */
+  --pfg-space-7: 20px;
+  --pfg-space-8: 24px;
+
+  /* ─── Signature surface gradients ────────────────────────── */
+  --pfg-grad-header:   linear-gradient(135deg, #0d2137 0%, #0a3d5c 50%, #0d4a5e 100%);
+  --pfg-grad-hero:     linear-gradient(135deg, #0d2137 0%, #0a3d5c 50%, #0d4a5e 100%);
+  --pfg-grad-spawn-bar:linear-gradient(90deg,
+                        #2196f3 0%, #4fc3f7 20%, #29b6f6 35%,
+                        #ff6b35 50%, #f44336 65%,
+                        #66bb6a 80%, #ffd54f 100%);
+
+  /* ─── Tinted overlays (used on cards / chips) ────────────── */
+  --pfg-tint-accent:   rgba(0,188,212,0.12);
+  --pfg-tint-accent-lo:rgba(0,188,212,0.08);
+  --pfg-tint-spawn:    rgba(255,107,53,0.12);
+  --pfg-tint-go:       rgba(76,175,80,0.12);
+  --pfg-tint-scout:    rgba(255,152,0,0.12);
+  --pfg-tint-hold:     rgba(33,150,243,0.12);
+  --pfg-tint-danger:   rgba(244,67,54,0.12);
+  --pfg-tint-white:    rgba(255,255,255,0.06);
+
+  /* ─── Typography ─────────────────────────────────────────── */
+  --pfg-font-sans:  'Inter', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  --pfg-font-mono:  ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+
+  --pfg-fs-10: 10px;   /* labels, captions, meta */
+  --pfg-fs-11: 11px;   /* small body, pill text */
+  --pfg-fs-12: 12px;   /* secondary body */
+  --pfg-fs-13: 13px;
+  --pfg-fs-14: 14px;   /* default body */
+  --pfg-fs-16: 16px;   /* h3 / hero headline */
+  --pfg-fs-18: 18px;   /* h2 */
+  --pfg-fs-20: 20px;   /* h1 (mobile header brand) */
+  --pfg-fs-32: 32px;   /* phase icon */
+  --pfg-fs-44: 44px;   /* big water temp */
+
+  /* Weights — Inter is loaded 400/500/600/700/800 */
+  --pfg-fw-body:    400;
+  --pfg-fw-medium:  500;
+  --pfg-fw-semi:    600;
+  --pfg-fw-bold:    700;
+  --pfg-fw-black:   800;
+
+  /* Letter-spacing — heavy use of uppercase eyebrow labels */
+  --pfg-ls-tight:   -0.5px;   /* hero display */
+  --pfg-ls-eyebrow: 1px;      /* uppercase caption */
+  --pfg-ls-brand:   2px;      /* TALE WATERS & TIDES eyebrow */
+}
+
+/* ============================================================
+   Base body + semantic type roles
+   (lift these onto any wrapper to get the PFG look)
+   ============================================================ */
+.pfg-body,
+body.pfg-body {
+  font-family: var(--pfg-font-sans);
+  background: var(--pfg-bg);
+  color: var(--pfg-fg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* ─── Display / hero ─────────────────────────────────────────
+   Used on the marketing landing: "Fishing Intel for Arkansas Anglers".
+   Very tight tracking, heavy weight. Cyan brand accent inside. */
+.pfg-display {
+  font-size: clamp(40px, 6vw, 72px);
+  font-weight: 800;
+  line-height: 1.02;
+  letter-spacing: -1.5px;
+  color: #ffffff;
+}
+
+/* ─── Headings ───────────────────────────────────────────── */
+.pfg-h1 { font-size: var(--pfg-fs-20); font-weight: 800; letter-spacing: -0.5px; color: #fff; }
+.pfg-h2 { font-size: var(--pfg-fs-18); font-weight: 800; color: #fff; }
+.pfg-h3 { font-size: var(--pfg-fs-16); font-weight: 700; color: #fff; }
+.pfg-h4 { font-size: var(--pfg-fs-14); font-weight: 700; color: #fff; }
+
+/* ─── Eyebrow (uppercase caption above titles) ────────────── */
+.pfg-eyebrow {
+  font-size: var(--pfg-fs-11);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: var(--pfg-ls-eyebrow);
+  color: var(--pfg-fg-muted);
+}
+.pfg-eyebrow-brand {
+  font-size: var(--pfg-fs-10);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: var(--pfg-ls-brand);
+  color: var(--pfg-accent);
+  opacity: 0.8;
+}
+.pfg-eyebrow-accent {
+  font-size: var(--pfg-fs-11);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: var(--pfg-ls-eyebrow);
+  color: var(--pfg-accent);
+}
+
+/* ─── Body copy ──────────────────────────────────────────── */
+.pfg-p       { font-size: var(--pfg-fs-13); line-height: 1.55; color: var(--pfg-fg); }
+.pfg-p-muted { font-size: var(--pfg-fs-12); line-height: 1.5;  color: var(--pfg-fg-muted); }
+.pfg-p-dim   { font-size: var(--pfg-fs-11); line-height: 1.45; color: var(--pfg-fg-dim); }
+
+/* ─── Metric / big number (e.g. "54.5°F") ────────────────── */
+.pfg-metric-xl {
+  font-size: var(--pfg-fs-44);
+  font-weight: 800;
+  line-height: 1;
+  color: #ffffff;
+  font-variant-numeric: tabular-nums;
+}
+.pfg-metric-xl .pfg-unit { font-size: var(--pfg-fs-18); color: var(--pfg-fg-muted); font-weight: 600; }
+
+.pfg-metric {
+  font-size: var(--pfg-fs-14);
+  font-weight: 700;
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ─── Pill / chip ────────────────────────────────────────── */
+.pfg-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--pfg-fs-11);
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: var(--pfg-radius-pill);
+  background: var(--pfg-bg3);
+  border: 1.5px solid transparent;
+  color: var(--pfg-fg-muted);
+}
+.pfg-pill--active {
+  background: var(--pfg-tint-accent);
+  border-color: var(--pfg-accent);
+  color: var(--pfg-accent);
+}
+
+/* ─── Code / mono (used only for station IDs, gauge nums) ── */
+.pfg-mono {
+  font-family: var(--pfg-font-mono);
+  font-size: var(--pfg-fs-11);
+  color: var(--pfg-fg-muted);
+  font-variant-numeric: tabular-nums;
+}
