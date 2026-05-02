@@ -171,8 +171,8 @@
                 Build your dock.
               </h2>
 
-              <button style={socialBtn}><I.Apple/> Continue with Apple</button>
-              <button style={{ ...socialBtn, marginTop: 8, background: "#fff", color: "#202124" }}>
+              <button onClick={() => setStep(2)} style={socialBtn}><I.Apple/> Continue with Apple</button>
+              <button onClick={() => setStep(2)} style={{ ...socialBtn, marginTop: 8, background: "#fff", color: "#202124" }}>
                 <I.Google/> Continue with Google
               </button>
 

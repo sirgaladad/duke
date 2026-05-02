@@ -53,8 +53,12 @@
   }
 
   /* ---------- VARIANT A · Verdict-front ------------------- */
+  const VERDICT_COLOR    = { GO: "var(--pfg-go)", SCOUT: "var(--pfg-scout)", HOLD: "var(--pfg-hold)" };
+  const VERDICT_HEADLINE = { GO: "GO FISH.",      SCOUT: "SCOUT IT.",        HOLD: "HOLD OFF." };
+
   function HeroVerdict({ signal, user }) {
-    const verdictColor = "var(--pfg-go)";
+    const verdict = signal?.verdict || "GO";
+    const verdictColor = VERDICT_COLOR[verdict] || VERDICT_COLOR.HOLD;
     return (
       <section style={{
         position: "relative",
@@ -83,7 +87,7 @@
               fontWeight: 800, color: verdictColor,
               textShadow: "0 0 40px rgba(76,175,80,0.35)"
             }}>
-              GO FISH.
+              {VERDICT_HEADLINE[verdict] || VERDICT_HEADLINE.HOLD}
             </div>
             <div style={{
               fontSize: 18, color: "#fff", fontWeight: 600,

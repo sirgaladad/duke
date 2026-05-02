@@ -93,9 +93,18 @@
     const [compareGate, setCompareGate] = React.useState(false);
     const [ripple, setRipple] = React.useState(0); // increments to retrigger
 
-    const card = CARDS[idx % CARDS.length];
+    const filteredCards = React.useMemo(
+      () => filter === "all" ? CARDS : CARDS.filter(c => c.type === filter),
+      [filter]
+    );
+
+    // Reset deck index whenever the active filter changes
+    React.useEffect(() => { setIdx(0); }, [filter]);
+
+    const card = filteredCards.length > 0 ? filteredCards[idx % filteredCards.length] : null;
 
     const swipe = (dir) => {
+      if (!card) return;
       if (dir === "right") {
         const next = [card, ...matches.filter(m => m.id !== card.id)].slice(0, 6);
         setMatches(next);
@@ -149,34 +158,50 @@
         <div style={{ display: "grid", gridTemplateColumns: "1.2fr 1fr", gap: 24, marginTop: 18 }}>
           {/* SWIPE DECK */}
           <div>
-            <div style={{
-              position: "relative", aspectRatio: "0.78",
-              maxWidth: 480, margin: "0 auto"
-            }}>
-              {/* card stack ghosts */}
-              <div style={{
-                position: "absolute", inset: "12px 24px -12px 24px",
-                background: "rgba(255,255,255,0.03)", borderRadius: 16,
-                border: "1px solid rgba(255,255,255,0.04)"
-              }}/>
-              <div style={{
-                position: "absolute", inset: "6px 12px -6px 12px",
-                background: "rgba(255,255,255,0.05)", borderRadius: 16,
-                border: "1px solid rgba(255,255,255,0.06)"
-              }}/>
-              <LiveMomentCard card={card} key={card.id + "-" + idx}/>
-              <Ripple key={"r-" + ripple}/>
-            </div>
+            {card ? (
+              <>
+                <div style={{
+                  position: "relative", aspectRatio: "0.78",
+                  maxWidth: 480, margin: "0 auto"
+                }}>
+                  {/* card stack ghosts */}
+                  <div style={{
+                    position: "absolute", inset: "12px 24px -12px 24px",
+                    background: "rgba(255,255,255,0.03)", borderRadius: 16,
+                    border: "1px solid rgba(255,255,255,0.04)"
+                  }}/>
+                  <div style={{
+                    position: "absolute", inset: "6px 12px -6px 12px",
+                    background: "rgba(255,255,255,0.05)", borderRadius: 16,
+                    border: "1px solid rgba(255,255,255,0.06)"
+                  }}/>
+                  <LiveMomentCard card={card} key={card.id + "-" + idx}/>
+                  <Ripple key={"r-" + ripple}/>
+                </div>
 
-            {/* actions */}
-            <div style={{ display: "flex", justifyContent: "center", gap: 14, marginTop: 18 }}>
-              <ActionBtn icon={<I.X size={22}/>} onClick={() => swipe("left")}
-                tone="#f44336" label="Pass"/>
-              <ActionBtn icon={<I.Star size={20}/>} onClick={() => swipe("right")}
-                tone="var(--pfg-accent)" label="Save" small/>
-              <ActionBtn icon={<I.Heart size={22}/>} onClick={() => swipe("right")}
-                tone="var(--pfg-spawn)" label="Match"/>
-            </div>
+                {/* actions */}
+                <div style={{ display: "flex", justifyContent: "center", gap: 14, marginTop: 18 }}>
+                  <ActionBtn icon={<I.X size={22}/>} onClick={() => swipe("left")}
+                    tone="#f44336" label="Pass"/>
+                  <ActionBtn icon={<I.Star size={20}/>} onClick={() => swipe("right")}
+                    tone="var(--pfg-accent)" label="Save" small/>
+                  <ActionBtn icon={<I.Heart size={22}/>} onClick={() => swipe("right")}
+                    tone="var(--pfg-spawn)" label="Match"/>
+                </div>
+              </>
+            ) : (
+              <div style={{
+                display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+                aspectRatio: "0.78", maxWidth: 480, margin: "0 auto",
+                background: "rgba(255,255,255,0.03)", borderRadius: 16,
+                border: "1px dashed rgba(255,255,255,0.1)",
+                color: "var(--pfg-fg-muted)", fontSize: 13, gap: 8, textAlign: "center", padding: 24
+              }}>
+                <span style={{ fontSize: 28 }}>🎣</span>
+                <div style={{ fontWeight: 700 }}>No cards match this filter</div>
+                <div style={{ fontSize: 11 }}>Try All or a different category</div>
+              </div>
+            )}
           </div>
 
           {/* COMMAND CENTER (right rail) */}

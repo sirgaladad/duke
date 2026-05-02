@@ -136,6 +136,17 @@ const __TWEAKS_STYLE = `
 // ── useTweaks ───────────────────────────────────────────────────────────────
 // Single source of truth for tweak values. setTweak persists via the host
 // (__edit_mode_set_keys → host rewrites the EDITMODE block on disk).
+
+// Compute the allowed parent origin once from document.referrer so all
+// postMessage calls use the same value and never silently broadcast with '*'.
+function getParentOrigin() {
+  try {
+    return document.referrer ? new URL(document.referrer).origin : window.location.origin;
+  } catch (_) {
+    return window.location.origin;
+  }
+}
+
 function useTweaks(defaults) {
   const [values, setValues] = React.useState(defaults);
   // Accepts either setTweak('key', value) or setTweak({ key: value, ... }) so a
@@ -145,7 +156,7 @@ function useTweaks(defaults) {
     const edits = typeof keyOrEdits === 'object' && keyOrEdits !== null
       ? keyOrEdits : { [keyOrEdits]: val };
     setValues((prev) => ({ ...prev, ...edits }));
-    window.parent.postMessage({ type: '__edit_mode_set_keys', edits }, '*');
+    window.parent.postMessage({ type: '__edit_mode_set_keys', edits }, getParentOrigin());
   }, []);
   return [values, setTweak];
 }
@@ -190,19 +201,24 @@ function TweaksPanel({ title = 'Tweaks', children }) {
   }, [open, clampToViewport]);
 
   React.useEffect(() => {
+    const parentOrigin = getParentOrigin();
+    const inIframe = window.parent !== window;
     const onMsg = (e) => {
+      // Always validate origin; in an iframe also confirm the message came from the parent frame.
+      if (e.origin !== parentOrigin) return;
+      if (inIframe && e.source !== window.parent) return;
       const t = e?.data?.type;
       if (t === '__activate_edit_mode') setOpen(true);
       else if (t === '__deactivate_edit_mode') setOpen(false);
     };
     window.addEventListener('message', onMsg);
-    window.parent.postMessage({ type: '__edit_mode_available' }, '*');
+    window.parent.postMessage({ type: '__edit_mode_available' }, parentOrigin);
     return () => window.removeEventListener('message', onMsg);
   }, []);
 
   const dismiss = () => {
     setOpen(false);
-    window.parent.postMessage({ type: '__edit_mode_dismissed' }, '*');
+    window.parent.postMessage({ type: '__edit_mode_dismissed' }, getParentOrigin());
   };
 
   const onDragStart = (e) => {

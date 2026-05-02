@@ -280,7 +280,7 @@ const DEFAULT_USER = {
 
 const SIGNAL = {
   verdict: "GO",
-  waterTemp: 54.5,
+  waterTempF: 54.5,
   baro: "Rising",
   baroValue: 30.18,
   wind: "SW 6 mph",
@@ -358,7 +358,7 @@ function App() {
       )}
 
       {/* MAIN COLUMN */}
-      <div style={{ flex: 1, marginLeft: railWidth, transition: "margin-left 200ms ease" }}>
+      <div style={{ flex: 1, minWidth: 0, transition: "margin-left 200ms ease" }}>
         <window.PfgTopBar
           user={user}
           currentRoute={route}

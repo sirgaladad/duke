@@ -122,7 +122,7 @@
             width: 8, height: 8, borderRadius: "50%",
             background: verdictColor,
             boxShadow: `0 0 8px ${verdictColor}`,
-            animation: "pfgPulse 1.6s ease-in-out infinite"
+            animation: "pfg-pulse 1.6s ease-in-out infinite"
           }}/>
           <span style={{ fontSize: 11, fontWeight: 800, letterSpacing: 0.8, color: verdictColor }}>
             {verdict}
