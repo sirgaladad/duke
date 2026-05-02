@@ -54,7 +54,16 @@
 
   /* ---------- VARIANT A · Verdict-front ------------------- */
   function HeroVerdict({ signal, user }) {
-    const verdictColor = "var(--pfg-go)";
+    const verdict = signal?.verdict || "GO";
+    const verdictColor = verdict === "GO"    ? "var(--pfg-go)"
+                       : verdict === "SCOUT" ? "var(--pfg-scout)"
+                       : "var(--pfg-hold)";
+    const verdictHeadline = verdict === "GO"    ? "GO FISH."
+                          : verdict === "SCOUT" ? "SCOUT IT."
+                          : "HOLD UP.";
+    const verdictGlow = verdict === "GO"    ? "rgba(76,175,80,0.35)"
+                      : verdict === "SCOUT" ? "rgba(255,213,79,0.35)"
+                      : "rgba(244,67,54,0.35)";
     return (
       <section style={{
         position: "relative",
@@ -81,9 +90,9 @@
             <div style={{
               fontSize: 96, lineHeight: 0.95, letterSpacing: -3,
               fontWeight: 800, color: verdictColor,
-              textShadow: "0 0 40px rgba(76,175,80,0.35)"
+              textShadow: `0 0 40px ${verdictGlow}`
             }}>
-              GO FISH.
+              {verdictHeadline}
             </div>
             <div style={{
               fontSize: 18, color: "#fff", fontWeight: 600,
@@ -343,6 +352,13 @@
 
   /* ---------- VARIANT C · Live Conditions Dashboard ------- */
   function HeroDashboard({ signal, user }) {
+    // Tick the "LIVE" header once a minute so the timestamp actually moves.
+    const [now, setNow] = React.useState(() => new Date());
+    React.useEffect(() => {
+      const id = setInterval(() => setNow(new Date()), 60_000);
+      return () => clearInterval(id);
+    }, []);
+    const liveTime = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     return (
       <section style={{
         position: "relative",
@@ -359,7 +375,7 @@
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end" }}>
             <div>
               <div style={{ fontSize: 10, letterSpacing: 2, fontWeight: 700, color: "var(--pfg-accent)" }}>
-                ● LIVE CONDITIONS · NORFORK TAILWATER · {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                ● LIVE CONDITIONS · NORFORK TAILWATER · {liveTime}
               </div>
               <div style={{ fontSize: 32, fontWeight: 800, color: "#fff", letterSpacing: -1, marginTop: 4 }}>
                 Three species at peak — fish them now.

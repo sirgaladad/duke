@@ -113,7 +113,7 @@
           <label style={{ ...fieldLabel, marginTop: 14 }}>PASSWORD</label>
           <div style={fieldWrap}>
             <span style={{ width: 15, color: "var(--pfg-fg-muted)" }}>🔒</span>
-            <input type="password" defaultValue="••••••••••" style={fieldInput}/>
+            <input type="password" placeholder="••••••••••" style={fieldInput}/>
           </div>
 
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 14 }}>
@@ -171,8 +171,11 @@
                 Build your dock.
               </h2>
 
-              <button style={socialBtn}><I.Apple/> Continue with Apple</button>
-              <button style={{ ...socialBtn, marginTop: 8, background: "#fff", color: "#202124" }}>
+              <button onClick={() => setStep(2)} style={socialBtn}>
+                <I.Apple/> Continue with Apple
+              </button>
+              <button onClick={() => setStep(2)}
+                      style={{ ...socialBtn, marginTop: 8, background: "#fff", color: "#202124" }}>
                 <I.Google/> Continue with Google
               </button>
 

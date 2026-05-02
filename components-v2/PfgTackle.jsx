@@ -120,7 +120,7 @@
 
         <SectionTitle>TOP MATCHES FOR TODAY</SectionTitle>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-          {SETUPS.slice(0,4).sort((a,b) => b.match - a.match).map(s => <SetupCard key={s.id} setup={s} compact/>)}
+          {[...SETUPS].sort((a,b) => b.match - a.match).slice(0,4).map(s => <SetupCard key={s.id} setup={s} compact/>)}
         </div>
 
         <SectionTitle style={{ marginTop: 20 }}>LURES MATCHING THIS SIGNAL</SectionTitle>

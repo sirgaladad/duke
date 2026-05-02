@@ -93,7 +93,19 @@
     const [compareGate, setCompareGate] = React.useState(false);
     const [ripple, setRipple] = React.useState(0); // increments to retrigger
 
-    const card = CARDS[idx % CARDS.length];
+    // Apply the type filter to the deck so the chip row actually narrows what
+    // you swipe through. Falls back to the full deck if a filter empties out.
+    const deck = React.useMemo(() => {
+      if (filter === "all") return CARDS;
+      const filtered = CARDS.filter(c => c.type === filter);
+      return filtered.length ? filtered : CARDS;
+    }, [filter]);
+
+    // Reset the swipe index whenever the deck changes so we don't index
+    // off the end of a smaller filtered list.
+    React.useEffect(() => { setIdx(0); }, [filter]);
+
+    const card = deck[idx % deck.length];
 
     const swipe = (dir) => {
       if (dir === "right") {
