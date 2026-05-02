@@ -32,16 +32,18 @@
   const rarityOf = (sp) => RARITY[(sp?.rarity || "").toLowerCase()] || RARITY.common;
 
   // Real PR log — keyed off species id so we resolve every detail (art, latin,
-  // rarity, family) from window.SPECIES. Add/remove rows here only.
+  // rarity, family) from window.SPECIES. `date` is the human display string;
+  // `dateISO` is the canonical sort key (string parsing of "Mar 22 '26" via
+  // Date.parse is unreliable across browsers).
   const PR_LOG = [
-    { spId: "alligator_gar",   weight: 38.0, lenIn: 56, date: "2026-02-11", lake: "Lower White River",   trophy: true },
-    { spId: "brown_trout",     weight: 11.4, lenIn: 28, date: "2026-03-12", lake: "Bull Shoals Tailwater", trophy: true },
-    { spId: "channel_catfish", weight: 6.80, lenIn: 24, date: "2026-02-19", lake: "Lake Conway" },
-    { spId: "largemouth_bass", weight: 5.85, lenIn: 21, date: "2026-03-22", lake: "Lake Conway" },
-    { spId: "walleye",         weight: 5.20, lenIn: 22, date: "2026-02-28", lake: "Greers Ferry" },
-    { spId: "smallmouth_bass", weight: 4.10, lenIn: 19, date: "2026-03-09", lake: "Crooked Creek" },
-    { spId: "white_bass",      weight: 2.80, lenIn: 16, date: "2026-02-24", lake: "Beaver Lake" },
-    { spId: "rainbow_trout",   weight: 2.10, lenIn: 15, date: "2026-04-02", lake: "Norfork Tailwater" }
+    { spId: "alligator_gar",   weight: 38.0, lenIn: 56, date: "Feb 11 '26", dateISO: "2026-02-11", lake: "Lower White River",     trophy: true },
+    { spId: "brown_trout",     weight: 11.4, lenIn: 28, date: "Mar 12 '26", dateISO: "2026-03-12", lake: "Bull Shoals Tailwater", trophy: true },
+    { spId: "channel_catfish", weight: 6.80, lenIn: 24, date: "Feb 19 '26", dateISO: "2026-02-19", lake: "Lake Conway" },
+    { spId: "largemouth_bass", weight: 5.85, lenIn: 21, date: "Mar 22 '26", dateISO: "2026-03-22", lake: "Lake Conway" },
+    { spId: "walleye",         weight: 5.20, lenIn: 22, date: "Feb 28 '26", dateISO: "2026-02-28", lake: "Greers Ferry" },
+    { spId: "smallmouth_bass", weight: 4.10, lenIn: 19, date: "Mar 09 '26", dateISO: "2026-03-09", lake: "Crooked Creek" },
+    { spId: "white_bass",      weight: 2.80, lenIn: 16, date: "Feb 24 '26", dateISO: "2026-02-24", lake: "Beaver Lake" },
+    { spId: "rainbow_trout",   weight: 2.10, lenIn: 15, date: "Apr 02 '26", dateISO: "2026-04-02", lake: "Norfork Tailwater" }
   ];
 
   const HOME_WATERS = [
@@ -57,13 +59,6 @@
     { spId: "bluegill",        weight: 0.55, when: "Sun",     lake: "Lake Conway" },
     { spId: "white_bass",      weight: 2.10, when: "Sat",     lake: "Beaver Lake" }
   ];
-
-  // Format an ISO date string (YYYY-MM-DD) to a short readable label like "Feb 11 '26".
-  function fmtDate(iso) {
-    const d = new Date(iso + "T00:00:00Z");
-    const mon = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][d.getUTCMonth()];
-    return `${mon} ${d.getUTCDate()} '${String(d.getUTCFullYear()).slice(2)}`;
-  }
 
   // Resolve a PR row → full species object + rarity + group, lazily so we
   // tolerate window.SPECIES being absent (defaults).
@@ -81,7 +76,7 @@
       const a = [...prs];
       if (sortKey === "weight") a.sort((x,y) => y.weight - x.weight);
       if (sortKey === "length") a.sort((x,y) => y.lenIn - x.lenIn);
-      if (sortKey === "recent") a.sort((x,y) => new Date(y.date) - new Date(x.date));
+      if (sortKey === "recent") a.sort((x,y) => (y.dateISO || "").localeCompare(x.dateISO || ""));
       return a;
     }, [prs, sortKey]);
 
@@ -394,7 +389,7 @@
                 }}/>
               </div>
               <div style={{ fontSize: 10, color: "var(--pfg-fg-muted)", marginTop: 2 }}>
-                {p.lake} · {fmtDate(p.date)} · {p.group.label}
+                {p.lake} · {p.date} · {p.group.label}
               </div>
             </div>
           </div>

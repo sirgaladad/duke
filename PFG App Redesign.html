@@ -25,6 +25,10 @@
     --pfg-lunar:     #ab47bc;
     --pfg-line:      rgba(255,255,255,0.06);
 
+    /* Sticky-header height. TopBar publishes its current value (56 / 64) so
+       the SideRail and any other sticky chrome can pin flush to the bar. */
+    --pfg-topbar-h:  64px;
+
     /* === Density (default: Standard) === */
     --pfg-density:    1;       /* multiplier for paddings/gaps */
     --pfg-type-scale: 1;       /* multiplier for font sizes   */
@@ -177,6 +181,14 @@
   /* Sonar: chunkier corners off, sharper edges */
   body[data-vibe="sonar"] [style*="border-radius"] {
     /* CSS can't reach inline styles directly; this is a no-op marker. */
+  }
+
+  /* Component-level keyframe used by per-screen styles (TopBar verdict dot,
+     SpeciesCardMini live dot). Defining it globally here so it works on
+     screens where the component that originally inlined it isn't mounted. */
+  @keyframes pfgPulse {
+    0%, 100% { opacity: 1;    transform: scale(1); }
+    50%      { opacity: 0.55; transform: scale(1.35); }
   }
 
   /* === URGENCY-DRIVEN MOTION === */
@@ -332,7 +344,6 @@ function App() {
   };
 
   const Icons = window.PfgIcons;
-  const railWidth = navVariant === "rail" ? (railExpanded ? 220 : 68) : 0;
 
   return (
     <div style={{ display: "flex", minHeight: "100vh" }}>
@@ -357,8 +368,12 @@ function App() {
         />
       )}
 
-      {/* MAIN COLUMN */}
-      <div style={{ flex: 1, minWidth: 0, transition: "margin-left 200ms ease" }}>
+      {/* MAIN COLUMN. The rail is a sticky flex sibling — it already takes its
+          own width in flow, so don't add a margin here or rail-mode would
+          double-offset the content (and leave a phantom gutter after sign-out
+          when the rail is unmounted). The rail's own width transition handles
+          the expand/collapse animation. */}
+      <div style={{ flex: 1, minWidth: 0 }}>
         <window.PfgTopBar
           user={user}
           currentRoute={route}

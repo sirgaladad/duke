@@ -42,10 +42,16 @@
     const verdictColor = verdict === "GO" ? "var(--pfg-go)"
                        : verdict === "SCOUT" ? "var(--pfg-scout)"
                        : "var(--pfg-hold)";
+    const headerH = dense ? 56 : 64;
+    // Publish header height so SideRail (and anything else sticky) can pin
+    // flush to the bar regardless of dense vs. regular mode.
+    React.useEffect(() => {
+      document.documentElement.style.setProperty("--pfg-topbar-h", headerH + "px");
+    }, [headerH]);
     return (
       <header style={{
         position: "sticky", top: 0, zIndex: 40,
-        height: dense ? 56 : 64,
+        height: headerH,
         display: "flex", alignItems: "center",
         padding: "0 22px",
         background: "rgba(13,27,42,0.85)",
@@ -183,7 +189,7 @@
 
   function Avatar({ user, size = 32, ring }) {
     const initials = (user.name || user.handle || "?")
-      .replace(/^@/, "").split(/[\s_]/).map(s => s[0]).slice(0,2).join("").toUpperCase();
+      .replace(/^@/, "").split(/[\s_]/).filter(Boolean).map(s => s[0]).slice(0,2).join("").toUpperCase();
     return (
       <div style={{
         width: size, height: size, borderRadius: "50%",
@@ -331,7 +337,8 @@
         background: "#0a1726", borderRight: "1px solid rgba(255,255,255,0.06)",
         display: "flex", flexDirection: "column",
         transition: "width 220ms ease",
-        position: "sticky", top: 64, height: "calc(100vh - 64px)",
+        position: "sticky", top: "var(--pfg-topbar-h, 64px)",
+        height: "calc(100vh - var(--pfg-topbar-h, 64px))",
         overflow: "hidden"
       }}>
         <div style={{ padding: "14px 14px 6px" }}>
