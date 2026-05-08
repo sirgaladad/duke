@@ -1,7 +1,6 @@
 # Gap Analysis: Duke → Pocket Fishing Guide
 
 **Status:** draft — 2026-05-08
-**Branch:** `claude/gap-analysis-duke-repo-KkDA0`
 **Audience:** PFG / Duke contributors planning the Duke → production migration
 
 ---
@@ -176,7 +175,7 @@ Duke's `index.html` (~23KB) embeds JSX inline alongside the `components-v2/` fil
 
 #### P2-4. Docs parity
 
-Add `ROADMAP.md`, `PLAN.md`, `CHANGELOG.md` mirroring PFG's structure. Duke's `README.md` is one line today. Effort: S.
+Add `ROADMAP.md`, `PLAN.md`, `CHANGELOG.md` mirroring PFG's structure. Duke's `README.md` is very minimal today (title + a one-line description). Effort: S.
 
 ---
 
@@ -205,7 +204,7 @@ Add `ROADMAP.md`, `PLAN.md`, `CHANGELOG.md` mirroring PFG's structure. Duke's `R
 - `components-v2/PfgTackle.jsx` — swap the placeholder `match`-score sort for condition-weighted lure scoring; add Live Bait Toggle.
 - `components-v2/PfgHome.jsx` — register Water Selector + Conditions Strip on home dashboard.
 - `data/species.js` — augment with phase data.
-- `README.md` — expand from one line to full project overview.
+- `README.md` — expand the current minimal stub into a full project overview.
 
 > Note: `components-v2/PfgShell.jsx` is **not** in this list. It owns the TopBar / SideRail / SideDrawer chrome only — route-content rendering lives in `index.html`'s `App` component.
 
@@ -239,7 +238,7 @@ Not in this backlog — flagged for awareness. These are Duke's UI contributions
 
 ## Verification checklist for this doc
 
-After this lands on `claude/gap-analysis-duke-repo-KkDA0`:
+After this doc lands on `main`:
 
 - [ ] PFG paths cited above (`data/lure-master.json`, `scripts/fetch_river_stations.js`, `.github/workflows/`) verified to exist in `sirgaladad/pocket-fishing-guide@main`
 - [ ] Duke target paths (`components-v2/PfgHero.jsx`, `components-v2/PfgTackle.jsx`, `data/species.js`) verified to exist in `sirgaladad/duke@main`
