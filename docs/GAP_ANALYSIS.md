@@ -24,7 +24,7 @@ For Duke to graduate from prototype to production replacement, it needs to absor
 |---|---|---|---|
 | Arkansas water bodies | None (just `homeWater` string on profile) | 39 waters w/ metadata, gauges, regs, access | **P0 missing** |
 | Real-time conditions (temp/flow/clarity) | Mock signal feeding hero verdict | USGS + 5-tier fallback, color-coded source badges | **P0 missing** |
-| Lure scoring engine | "Top 4 by recency" personal tackle | 21-lure canonical lib, condition-weighted scoring | **P0 missing** |
+| Lure scoring engine | "Top 4 by hardcoded `match` score" personal tackle | 21-lure canonical lib, condition-weighted scoring | **P0 missing** |
 | Species depth | 30 species, single `spawn` field each | 2 species deep (6 phases, temps, lure rankings) | **P0 partial** (Duke broader, PFG deeper) |
 | 7-day forecast | Placeholder screen | NWS-fed, working | **P0 missing** |
 | Access points / ramps | Placeholder screen | Full directory w/ GPS, status, AGFC links | **P0 missing** |
@@ -83,11 +83,11 @@ Duke is non-shippable as a PFG replacement without these.
 
 #### P0-3. Lure scoring engine + canonical 21-lure library
 
-- **Gap:** Duke's `PfgTackle.jsx` shows the user's top 4 personal setups by recency. PFG ranks the canonical 21-lure library against current conditions.
+- **Gap:** Duke's `PfgTackle.jsx` shows the user's top 4 personal setups sorted by a hardcoded `match` score on each setup (`PfgTackle.jsx:123` does `[...SETUPS].sort((a,b) => b.match - a.match).slice(0,4)`). The values are placeholders, not computed from live conditions. PFG ranks the canonical 21-lure library against current conditions.
 - **Source-of-truth in PFG:** `data/lure-master.json` (id, name, type, species[], bait_type, clarity_ranking, phase_ranking, cpc_link, howto_video). Scoring algorithm in `index.html` tackle-box modal.
 - **Target landing in Duke:**
   - Copy `lure-master.json` into `duke/data/`
-  - Replace recency sort in `components-v2/PfgTackle.jsx` with condition-weighted scoring (clarity × flow × temp × phase)
+  - Replace the placeholder `match`-score sort in `components-v2/PfgTackle.jsx` with condition-weighted scoring (clarity × flow × temp × phase) computed from live signal inputs
   - Add Live Bait Toggle (artificial ↔ live) — controls a `bait_type` filter
 - **Effort:** L
 - **Dependencies:** P0-2 (scoring inputs come from conditions strip)
@@ -103,7 +103,7 @@ Duke is non-shippable as a PFG replacement without these.
 
 #### P0-5. Build out the four placeholder screens
 
-`PfgShell.jsx` currently renders `<PlaceholderScreen>` for Signals / Forecast / Access / Technique.
+`index.html`'s `App` component currently renders `<window.PfgPlaceholderScreen>` inline for routes `signals`, `forecast`, `technique`, and `access` (the conditional render block under `<main>`). `PfgShell.jsx` only owns the navigation chrome (TopBar / SideRail / SideDrawer); it does not handle route-content rendering.
 
 - **Signals** → real conditions feed; composes `PfgConditions` + history sparkline.
 - **Forecast** → 7-day NWS view. PFG already has the data fetcher; reuse the snapshot files.
@@ -200,13 +200,14 @@ Add `ROADMAP.md`, `PLAN.md`, `CHANGELOG.md` mirroring PFG's structure. Duke's `R
 
 ## Files to modify in Duke
 
-- `index.html` — register new data files on `window`; mount new components.
+- `index.html` — register new data files on `window`; mount new components; **replace the four `<window.PfgPlaceholderScreen>` instances inside the `App` component (Signals / Forecast / Access / Technique routes) with the real screens built in P0-5**.
 - `components-v2/PfgHero.jsx` — replace mock `verdict` with computed value from conditions strip.
-- `components-v2/PfgTackle.jsx` — swap recency sort for condition-weighted lure scoring; add Live Bait Toggle.
+- `components-v2/PfgTackle.jsx` — swap the placeholder `match`-score sort for condition-weighted lure scoring; add Live Bait Toggle.
 - `components-v2/PfgHome.jsx` — register Water Selector + Conditions Strip on home dashboard.
-- `components-v2/PfgShell.jsx` — replace four `PlaceholderScreen` instances (Signals / Forecast / Access / Technique).
 - `data/species.js` — augment with phase data.
 - `README.md` — expand from one line to full project overview.
+
+> Note: `components-v2/PfgShell.jsx` is **not** in this list. It owns the TopBar / SideRail / SideDrawer chrome only — route-content rendering lives in `index.html`'s `App` component.
 
 ---
 
